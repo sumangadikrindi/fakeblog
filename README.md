@@ -1,3 +1,21 @@
+**To run this solution follow below steps on powershell command**
+```
+git clone https://github.com/sumangadikrindi/fakeblog.git
+# Define the content for the .env file
+$env_content = @"
+SQL_SA_PASSWORD=P@**w0rd
+FAKEBLOG_Users_SQLDBName=UsersDb
+FAKEBLOG_Blogs_SQLDBName=BlogsDb
+"@
+
+# Write the content to a .env file
+$env_content | Out-File -FilePath .env
+docker compose up -d --build
+
+#Now you should be able to test the solution at http://localhost:80/swagger
+
+```
+
 **Below I tried to express what I have implemented so far, to show case my understanding and skill in various .net development skills and knowledge on different patterns and technologies:**
 
 ```
