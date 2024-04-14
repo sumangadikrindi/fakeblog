@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option csharp_namespace = "FakeBlog.Users.Api";
+
+package userservice;
+
+service UserService {
+  rpc GetUserDetails (GetUserDetailsRequest) returns (GetUserDetailsResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+}
+
+message GetUserDetailsRequest {
+  string id = 1;
+}
+
+message GetUserDetailsResponse {
+  string id = 1;
+  string name = 2;
+  string lastname = 3;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string lastname = 2;
+}
+
+message CreateUserResponse {
+  string id = 1;
+}

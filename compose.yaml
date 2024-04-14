@@ -1,0 +1,90 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+services:
+  fakeblogapi:
+    image: sumangadikrindi/fakeblogapi:latest
+    container_name: fakeblogapi
+    build:
+      context: FakeBlog.Api
+      dockerfile: Dockerfile
+      target: final
+    ports:
+      - 80:80
+    networks:
+      - fakeblognetwork
+    depends_on:
+      - blogsgrpc
+      - usersgrpc
+    environment:
+      - FakeBlog_Blogs_GRPC_URL=http://blogsgrpc:50051
+      - FakeBlog_Users_GRPC_URL=http://usersgrpc:50051
+      - ASPNETCORE_ENVIRONMENT=Development
+  blogsgrpc:
+    image: sumangadikrindi/blogsgrpc:latest
+    container_name: blogsgrpc
+    build:
+      context: FakeBlog.Blogs.Api
+      dockerfile: Dockerfile
+      target: final
+    ports:
+      - 8081:80
+      - 5051:50051
+    networks:
+      - fakeblognetwork
+    environment:
+      - FakeBlog_Blogs_SQL_ConnectionString=Server=sqldbserver;Database=${FAKEBLOG_Blogs_SQLDBName};TrustServerCertificate=True;User=sa;Password=${SQL_SA_PASSWORD}
+    depends_on:
+      sqldbserver:
+        condition: service_healthy
+  usersgrpc:
+    image: sumangadikrindi/usersgrpc:latest
+    container_name: usersgrpc
+    build:
+      context: FakeBlog.Users.Api
+      dockerfile: Dockerfile
+      target: final
+    ports:
+      - 8082:80
+      - 5052:50051
+    networks:
+      - fakeblognetwork
+    environment:
+      - FakeBlog_Users_SQL_ConnectionString=Server=sqldbserver;Database=${FAKEBLOG_Users_SQLDBName};TrustServerCertificate=True;User=sa;Password=${SQL_SA_PASSWORD}
+    depends_on:
+      sqldbserver:
+        condition: service_healthy
+  sqldbserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - MSSQL_COLLATION=Latin1_General_BIN2
+      - MSSQL_PID=Express
+      - MSSQL_SA_PASSWORD=${SQL_SA_PASSWORD}
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    networks:
+      - fakeblognetwork
+    volumes:
+      - sqldata:/var/opt/mssql/data
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost,1433", "-U", "sa", "-P", "${SQL_SA_PASSWORD}", "-Q", "Select 1"]
+      start_period: 20s
+      interval: 60s
+      timeout: 30s
+      retries: 3
+volumes:
+  sqldata:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: C:\Users\Admin\SQLDB_In_Container\data
+networks:
+  fakeblognetwork:

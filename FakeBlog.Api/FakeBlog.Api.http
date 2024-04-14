@@ -1,0 +1,10 @@
+@FakeBlog.Api_HostAddress = http://localhost:80/
+
+POST {{FakeBlog.Api_HostAddress}}/RegisterAuthor/
+Content-Type: application/json
+
+{
+    "name": "Suman",
+    "lastname": "Gadikrindi"
+}
+###

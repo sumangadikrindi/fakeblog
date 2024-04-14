@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option csharp_namespace = "FakeBlog.Blogs.Api";
+
+package blogservice;
+
+service BlogService {
+  rpc CreateBlog (CreateBlogRequest) returns (CreateBlogResponse);
+  rpc GetBlog (GetBlogRequest) returns (GetBlogResponse);
+}
+
+message CreateBlogRequest {
+    string authorId = 1;
+    string title = 2;
+    string description = 3;
+    string content = 4;
+}
+
+message CreateBlogResponse {
+  string id = 1;
+}
+
+message GetBlogRequest {
+    string id = 1;
+}
+
+message GetBlogResponse {
+    string id = 1;
+    string authorId = 2;
+    string title = 3;
+    string description = 4;
+    string content = 5;
+}
